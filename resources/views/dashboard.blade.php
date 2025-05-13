@@ -1,188 +1,181 @@
+<link href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css" rel="stylesheet">
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new DataTable('#example', {
+            searching: false,
+            lengthChange: false,
+            paging: true,
+            ordering: false,
+            pageLength: 5 // 👈 Set this to show 5 results per page
+
+        });
+    });
+</script>
+
+
+
+
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-            <style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-/* tr:nth-child(even) {
-  background-color: #dddddd;
-} */
-</style>
-        </h2>
     </x-slot>
+    {{-- <div class="flex justify-end mt-6 items-right gap-4">
+        <form method="POST" action="#">
+            @csrf
+            <input type="hidden" name="hotels" value="{{ base64_encode(json_encode($results)) }}">
+            <input type="hidden" name="query" value="{{ $query }}">
+            <button type="submit"
+                class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                </svg>
+                Export to Excel
+            </button>
+        </form>
+    </div> --}}
+    <div class="flex justify-end mt-6">
+        <div class="flex flex-col gap-2 mr-[40px]">
+            <!-- Export Button Form -->
+            <form method="POST" action="{{ route('hotels.export') }}">
+                @csrf
+                <input type="hidden" name="hotels" value="{{ base64_encode(json_encode($results)) }}">
+                <input type="hidden" name="query" value="{{ $query }}">
+                <button type="submit"
+                    class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium leading-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                    </svg>
+                    Export to Excel
+                </button>
+            </form>
 
-    <button type="button" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease;">
-    Generate Report
-</button>
+            <!-- Generate Chart Link (styled as button) -->
+            <a href="{{ url('/motels-chart') }}"
+                class="flex items-center gap-2 bg-yellow-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium leading-5">
+                Generate Chart
+            </a>
+        </div>
+    </div>
+
+
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <table>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    {{-- Search form --}}
+                    <form action="{{ url('/dashboard') }}" method="GET"
+                        class="w-full max-w-7xl flex flex-wrap sm:flex-nowrap items-center gap-2 border border-gray-300 rounded-lg p-4 mb-4">
 
-  <tr>
-    <th>Motel</th>
-    <th>Contact</th>
-    <th>postal code</th>
-    <th>website</th>
-    <th>score</th>
-    <th>rank</th>
-    <th>rating</th>
-    <th> user rating</th>
-    <th>Lat</th>
-    <th>lng</th>
-    <th>photos</th>
+                        <!-- Search input -->
+                        <input type="text" name="motel" placeholder="Motel" value="{{ request('motel') }}"
+                            class="flex-grow px-4 py-2 border border-gray-300 rounded focus:outline-none">
+                        <input step="any" type="number" name="rating" placeholder="Rating"
+                            value="{{ request('rating') }}"
+                            class="flex-grow px-4 py-2 border border-gray-300 rounded focus:outline-none">
+
+                        <input type="text" name="price" placeholder="Price per night" value="{{ request('price') }}"
+                            class="flex-grow px-4 py-2 border border-gray-300 rounded focus:outline-none">
+                        <input type="text" name="score" placeholder="Score" value="{{ request('score') }}"
+                            class="flex-grow px-4 py-2 border border-gray-300 rounded focus:outline-none">
+                        <input type="text" name="rank" placeholder="Rank" value="{{ request('rank') }}"
+                            class="border border-gray-300 rounded focus:outline-none" style="width: 68px">
+
+                        <!-- Per page dropdown -->
+                        {{-- <select name="per_page"
+                            class="min-w-[100px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none">
+                            <option value="5" {{ request('per_page')==5 ? 'selected' : '' }}>5</option>
+                            <option value="10" {{ request('per_page')==10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page')==15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ request('per_page')==20 ? 'selected' : '' }}>20</option>
+                        </select> --}}
+
+                        <!-- Submit -->
+                        <button type="submit"
+                            class=" min-w-[100px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none">
+                            Search
+                        </button>
+                        <a href="{{ route('dashboard') }}"
+                            class="min-w-[100px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none">
+                            Clear
+                        </a>
+                    </form>
 
 
-    
+                    {{-- showing results here --}}
+                    @if(!empty($query))
+                    <h2 class="text-lg font-bold mt-6 mb-4">Results for "{{ $query }}"</h2>
+                    @if(count($results))
+                    <div class="w-full overflow-x-auto">
+                        <table id="example" class="min-w-full bg-white border border-gray-300 rounded shadow">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-left px-4 py-2">Name</th>
+                                    <th class="text-left px-4 py-2">Address</th>
+                                    <th class="text-left px-4 py-2">Rating</th>
+                                    {{-- <th class="text-left px-4 py-2">Operating Status</th> --}}
+                                    <th class="text-left px-4 py-2">Total Ratings</th>
+                                    <th class="text-left px-4 py-2">Estimated Price</th>
+                                    <th class="text-left px-4 py-2">Score</th>
+                                    <th class="text-left px-4 py-2">Rank</th>
+                                    {{-- <th class="text-left px-4 py-2">Distance from Airport in KM</th> --}}
+                                </tr>
+                            </thead>
+                            <tbody>
 
-  </tr>
-  <tr>
-    <td>Sunset Motel</td>
-    <td>123-456-7890</td>
-    <td>12345</td>
-    <td>www.sunsetmotel.com</td>
-    <td>85</td>
-    <td>3</td>
-    <td>4.2</td>
-    <td>4.5</td>
-    <td>34.0522</td>
-    <td>-118.2437</td>
-    <td><img src="photo1.jpg" alt="Sunset Motel"></td>
-</tr>
-<tr>
-    <td>Beachside Inn</td>
-    <td>987-654-3210</td>
-    <td>67890</td>
-    <td>www.beachsideinn.com</td>
-    <td>90</td>
-    <td>1</td>
-    <td>4.8</td>
-    <td>4.9</td>
-    <td>36.7783</td>
-    <td>-119.4179</td>
-    <td><img src="photo2.jpg" alt="Beachside Inn"></td>
-</tr>
-<tr>
-    <td>Mountain Lodge</td>
-    <td>234-567-8901</td>
-    <td>11223</td>
-    <td>www.mountainlodge.com</td>
-    <td>75</td>
-    <td>5</td>
-    <td>3.9</td>
-    <td>4.0</td>
-    <td>39.7392</td>
-    <td>-104.9903</td>
-    <td><img src="photo3.jpg" alt="Mountain Lodge"></td>
-</tr>
-<tr>
-    <td>City Stay Motel</td>
-    <td>345-678-9012</td>
-    <td>44556</td>
-    <td>www.citystaymotel.com</td>
-    <td>80</td>
-    <td>4</td>
-    <td>4.0</td>
-    <td>4.1</td>
-    <td>40.7128</td>
-    <td>-74.0060</td>
-    <td><img src="photo4.jpg" alt="City Stay Motel"></td>
-</tr>
-<tr>
-    <td>Parkview Lodge</td>
-    <td>456-789-0123</td>
-    <td>66778</td>
-    <td>www.parkviewlodge.com</td>
-    <td>95</td>
-    <td>2</td>
-    <td>4.7</td>
-    <td>4.8</td>
-    <td>41.8781</td>
-    <td>-87.6298</td>
-    <td><img src="photo5.jpg" alt="Parkview Lodge"></td>
-</tr>
-<tr>
-    <td>Coastal Motel</td>
-    <td>567-890-1234</td>
-    <td>22334</td>
-    <td>www.coastalmotel.com</td>
-    <td>70</td>
-    <td>7</td>
-    <td>3.5</td>
-    <td>3.6</td>
-    <td>33.8688</td>
-    <td>-118.2279</td>
-    <td><img src="photo6.jpg" alt="Coastal Motel"></td>
-</tr>
-<tr>
-    <td>Riverside Motel</td>
-    <td>678-901-2345</td>
-    <td>88900</td>
-    <td>www.riversidemotel.com</td>
-    <td>85</td>
-    <td>6</td>
-    <td>4.3</td>
-    <td>4.4</td>
-    <td>32.7157</td>
-    <td>-117.1611</td>
-    <td><img src="photo7.jpg" alt="Riverside Motel"></td>
-</tr>
-<tr>
-    <td>Oasis Motel</td>
-    <td>789-012-3456</td>
-    <td>55667</td>
-    <td>www.oasismotel.com</td>
-    <td>65</td>
-    <td>9</td>
-    <td>3.2</td>
-    <td>3.3</td>
-    <td>38.8895</td>
-    <td>-77.0353</td>
-    <td><img src="photo8.jpg" alt="Oasis Motel"></td>
-</tr>
-<tr>
-    <td>Lakeside Motel</td>
-    <td>890-123-4567</td>
-    <td>33445</td>
-    <td>www.lakesidemotel.com</td>
-    <td>78</td>
-    <td>8</td>
-    <td>4.0</td>
-    <td>4.2</td>
-    <td>37.7749</td>
-    <td>-122.4194</td>
-    <td><img src="photo9.jpg" alt="Lakeside Motel"></td>
-</tr>
-<tr>
-    <td>Desert Inn</td>
-    <td>901-234-5678</td>
-    <td>44567</td>
-    <td>www.desertinn.com</td>
-    <td>88</td>
-    <td>10</td>
-    <td>4.5</td>
-    <td>4.6</td>
-    <td>36.1699</td>
-    <td>-115.1398</td>
-    <td><img src="photo10.jpg" alt="Desert Inn"></td>
-</tr>
+                                @foreach($results as $motel)
+                                <tr class="border-t hover:bg-gray-50">
+                                    <td class="px-4 py-2 font-semibold">
+                                        @if ($motel['weblink'] !== 'Not available')
+                                        <a href="{{ $motel['weblink'] }}" target="_blank" rel="noopener noreferrer"
+                                            class="text-blue-600 hover:underline">
+                                            {{ $motel['name'] }}
+                                        </a>
+                                        @else
+                                        <a href="https://www.google.com/search?q={{ urlencode($motel['name'] . ' motel in ' . $query) }}"
+                                            target="_blank" rel="noopener noreferrer"
+                                            class="text-blue-600 hover:underline">
+                                            {{$motel['name']}}
+                                        </a>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">{{ $motel['address'] }}</td>
+                                    <td class="px-4 py-2 text-yellow-500"><span>⭐ {{ $motel->ranking['rating'] ?? ''
+                                            }}</span>
+                                    </td>
+                                    {{-- <td class="px-4 py-2 text-gray-600">{{ $motel['status'] }}</td> --}}
+                                    <td class="px-4 py-2 text-gray-600">{{ $motel->ranking['user_total_rating'] }}
+                                    </td>
+                                    <td class="px-4 py-2  font-medium">
+                                        <span class="text-green-600">$</span> {{ $motel['price'] }}
+                                    </td>
+                                    {{-- <td class="px-4 py-2 text-blue-600">
+                                        {{ $motel['distance_from_airport'] }}
+                                    </td> --}}
+                                    <td class="px-4 py-2 text-gray-600">{{ $motel->ranking['score'] }}</td>
+                                    <td class="px-4 py-2 text-gray-600">{{ $motel->ranking['rank'] }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
+                    <p class="text-gray-500">No motels found for this location.</p>
+                    @endif
 
-</table>
+
+                    @endif
+                    {{-- end of showing results --}}
                 </div>
             </div>
+
         </div>
-    </div>
 </x-app-layout>
