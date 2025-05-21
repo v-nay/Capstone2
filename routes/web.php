@@ -6,7 +6,7 @@ use App\Http\Controllers\MotelController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.register');
     // return view('auth.login');
 });
 Route::middleware(['auth', 'verified'])->group(function () {
